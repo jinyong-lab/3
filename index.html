@@ -82,7 +82,6 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
 .result-msg{text-align:center;font-size:1.05rem;font-weight:600;margin-bottom:18px;}
 .wrong-list h3{font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
 .wrong-item{padding:10px 14px;border-radius:8px;margin-bottom:6px;background:#fef2f2;}
-.wrong-word{font-weight:700;color:var(--danger);font-size:1rem;}
 .wrong-eng{font-weight:600;color:var(--danger);font-size:0.9rem;margin-bottom:4px;}
 .wrong-kor{font-size:0.82rem;color:#7f1d1d;line-height:1.5;}
 .result-btns{display:flex;gap:10px;margin-top:18px;}
@@ -106,6 +105,7 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
 <div class="tabs">
   <button class="tab active" onclick="switchTab('vocab')">단어 시험</button>
   <button class="tab" onclick="switchTab('sentence')">문장 해석 시험</button>
+  <button class="tab" onclick="switchTab('kichul')" style="border-color:#f59e0b;color:#92400e;">⭐ 기출문제</button>
 </div>
 
 <!-- ===== 단어 시험 탭 ===== -->
@@ -167,13 +167,11 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
       <div class="result-msg" id="v-result-msg"></div>
       <div class="result-btns">
         <button class="btn btn-skip" onclick="vShowMode()">처음으로</button>
+        <button class="btn btn-primary" id="v-retry-btn" onclick="vRetry()">틀린 것만 재시험</button>
       </div>
     </div>
     <div class="card wrong-list" id="v-wrong-card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h3 style="font-size:0.95rem;color:var(--danger);font-weight:700;" id="v-wrong-title">틀린 단어</h3>
-        <button class="btn btn-primary" id="v-retry-btn" onclick="vRetry()" style="flex:none;padding:9px 18px;font-size:0.88rem;">틀린 단어만 재시험 →</button>
-      </div>
+      <h3>틀린 단어 목록</h3>
       <div id="v-wrong-body"></div>
     </div>
   </div>
@@ -254,6 +252,83 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
   </div>
 
 </div><!-- /tab-sentence -->
+
+<!-- ===== 기출문제 탭 ===== -->
+<div id="tab-kichul" class="screen">
+  <div id="kichul-mode" class="screen active">
+    <div class="card" style="border-color:#f59e0b;background:#fffbeb;">
+      <div style="font-size:0.8rem;color:#92400e;font-weight:700;margin-bottom:6px;">형광펜 표시 기출문제 · 4개 문단</div>
+      <h2 style="font-size:1.1rem;">전체 문단 번역 시험</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin:8px 0 16px;line-height:1.6;">원본 PDF에서 형광색으로 표시된 4개 문단을 번역하는 시험입니다.<br>영어 문단을 읽고 한국어로 번역한 뒤, 모범 번역과 비교하여 채점하세요.</p>
+      <button class="start-btn" style="background:#d97706;" onclick="kStart()">기출문제 시험 시작 →</button>
+    </div>
+    <div class="card" style="background:#f8fafc;">
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;font-weight:600;">4개 기출 문단 미리보기</div>
+      <div style="font-size:0.82rem;color:var(--text);line-height:1.7;">
+        <div style="margin-bottom:8px;padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid #f59e0b;">
+          <b>① PAGE 2</b> — 다중회귀와 단순회귀의 관계<br>
+          <span style="color:var(--muted);">Multiple linear regression is an extension...</span>
+        </div>
+        <div style="margin-bottom:8px;padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid #f59e0b;">
+          <b>② PAGE 6</b> — 회귀계수의 해석<br>
+          <span style="color:var(--muted);">The interpretation of the regression coefficients...</span>
+        </div>
+        <div style="margin-bottom:8px;padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid #f59e0b;">
+          <b>③ PAGE 14</b> — R²의 의미<br>
+          <span style="color:var(--muted);">When the model fits the data well...</span>
+        </div>
+        <div style="padding:8px 10px;background:#fff;border-radius:8px;border-left:3px solid #f59e0b;">
+          <b>④ PAGE 28</b> — 제약 추정<br>
+          <span style="color:var(--muted);">Sometimes in fitting regression equations...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kichul-quiz" class="screen">
+    <div class="card" style="border-color:#f59e0b;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:0.8rem;color:#92400e;font-weight:700;">기출문제</span>
+        <span class="progress-label" id="k-prog-label" style="margin:0;">1 / 4</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="k-prog-bar" style="width:0%;background:#d97706;"></div></div>
+      <div style="font-size:0.78rem;color:var(--muted);margin:10px 0 4px;" id="k-section-label">PAGE 2</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px;">아래 영어 문단 전체를 한국어로 번역하세요</div>
+      <div class="sent-display" id="k-passage" style="font-size:0.95rem;border-left-color:#d97706;"></div>
+      <textarea class="sent-textarea" id="k-input" placeholder="한국어 번역을 여기에 입력하세요..." style="min-height:140px;"></textarea>
+      <div class="model-answer" id="k-model" style="display:none;background:#fef3c7;">
+        <div class="label" style="color:#92400e;">모범 번역</div>
+        <div class="text" id="k-model-text" style="color:#1c1917;"></div>
+      </div>
+      <div class="self-assess" id="k-assess">
+        <button class="assess-btn assess-correct" onclick="kAssess(true)">✔ 잘 번역했어요</button>
+        <button class="assess-btn assess-wrong" onclick="kAssess(false)">✘ 다시 공부할게요</button>
+      </div>
+      <div class="btn-row" id="k-btn-row">
+        <button class="btn btn-skip" onclick="kSkip()">건너뛰기</button>
+        <button class="btn btn-primary" id="k-submit-btn" onclick="kSubmit()" style="background:#d97706;">번역 확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="kichul-result" class="screen">
+    <div class="card" style="text-align:center;border-color:#f59e0b;">
+      <div class="score-circle" style="border-color:#d97706;">
+        <span class="score-pct" id="k-score-pct" style="color:#d97706;">0%</span>
+        <span class="score-sub" id="k-score-frac">0/4</span>
+      </div>
+      <div class="result-msg" id="k-result-msg"></div>
+      <div class="result-btns">
+        <button class="btn btn-skip" onclick="kShowMode()">처음으로</button>
+        <button class="btn btn-primary" onclick="kStart()" style="background:#d97706;">다시 시험</button>
+      </div>
+    </div>
+    <div class="card wrong-list" id="k-wrong-card" style="display:none;">
+      <h3 style="margin-bottom:12px;">복습할 문단</h3>
+      <div id="k-wrong-body"></div>
+    </div>
+  </div>
+</div><!-- /tab-kichul -->
 
 </div><!-- /container -->
 
@@ -437,11 +512,13 @@ let activeTab = 'vocab';
 
 function switchTab(tab) {
   activeTab = tab;
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', (i===0 && tab==='vocab') || (i===1 && tab==='sentence'));
-  });
+  const tabs = document.querySelectorAll('.tab');
+  tabs[0].classList.toggle('active', tab==='vocab');
+  tabs[1].classList.toggle('active', tab==='sentence');
+  tabs[2].classList.toggle('active', tab==='kichul');
   document.getElementById('tab-vocab').classList.toggle('active', tab==='vocab');
   document.getElementById('tab-sentence').classList.toggle('active', tab==='sentence');
+  document.getElementById('tab-kichul').classList.toggle('active', tab==='kichul');
 }
 
 function showSubScreen(prefix, name) {
@@ -506,15 +583,10 @@ function vSubmit(){
   document.getElementById('v-next-btn').style.display='block';
 }
 function vCheck(ans,item){
-  // item.m을 쉼표로 분리 → 각 뜻 중 하나라도 맞으면 정답
-  const meanings = item.m.split(/[,，]/).map(s=>s.trim()).filter(s=>s);
-  const userKr = (ans.match(/[가-힣]+/g)||[]).join('');
-  for(const meaning of meanings){
-    const kws = meaning.match(/[가-힣]+/g)||[];
-    for(const kw of kws){
-      if(kw.length>=2 && userKr.includes(kw)) return true;
-    }
-  }
+  const kws=item.mf.match(/[가-힣]+/g)||[];
+  const userKr=ans.match(/[가-힣]+/g)||[];
+  const userStr=userKr.join('');
+  for(const kw of kws){ if(kw.length>=2 && userStr.includes(kw)) return true; }
   return false;
 }
 function vHint(){
@@ -542,21 +614,11 @@ function vShowResult(){
   document.getElementById('v-score-frac').textContent=`${vCorrect} / ${total}`;
   const msgs=[[100,'완벽합니다! 만점! 🎉'],[90,'거의 다 맞혔어요! 👏'],[80,'잘 했어요! 👍'],[60,'절반 이상! 복습이 필요해요. 📖'],[0,'틀린 단어를 다시 공부해봐요. 💪']];
   for(const[t,msg] of msgs){ if(pct>=t){document.getElementById('v-result-msg').textContent=msg;break;} }
+  document.getElementById('v-retry-btn').style.display=vWrong.length>0?'block':'none';
   const wc=document.getElementById('v-wrong-card'), wb=document.getElementById('v-wrong-body');
   wb.innerHTML='';
-  if(vWrong.length>0){
-    wc.style.display='block';
-    document.getElementById('v-wrong-title').textContent=`틀린 단어 ${vWrong.length}개`;
-    document.getElementById('v-retry-btn').style.display='block';
-    vWrong.forEach(it=>{
-      const d=document.createElement('div'); d.className='wrong-item';
-      // 정답이 여러 개면 모두 표시
-      const meanings = it.m.split(/[,，]/).map(s=>s.trim()).filter(s=>s);
-      const meaningHTML = meanings.map(m=>`<span style="background:#fff;border-radius:4px;padding:1px 6px;margin-right:4px;font-size:0.82rem;">${m}</span>`).join('');
-      d.innerHTML=`<span class="wrong-word">${it.w}</span><div style="margin-top:5px;">${meaningHTML}</div>`;
-      wb.appendChild(d);
-    });
-  } else wc.style.display='none';
+  if(vWrong.length>0){ wc.style.display='block'; vWrong.forEach(it=>{ const d=document.createElement('div'); d.className='wrong-item'; d.innerHTML=`<span class="wrong-eng">${it.w}</span> <span class="wrong-kor">→ ${it.m}</span>`; wb.appendChild(d); }); }
+  else wc.style.display='none';
   showSubScreen('vocab','result');
 }
 function vShowMode(){ showSubScreen('vocab','mode'); }
@@ -638,6 +700,138 @@ function sShowResult(){
 }
 function sShowMode(){ showSubScreen('sent','mode'); }
 function sRetry(){ if(!sWrong.length)return; sPool=sWrong.slice().sort(()=>Math.random()-.5); sCur=0;sCorrect=0;sWrong=[]; showSubScreen('sent','quiz'); sLoad(); }
+
+// ============================================================
+// 기출문제 데이터 (형광펜 4개 문단 + 문장별 번역)
+// ============================================================
+const KICHUL = [
+  {
+    page: 'PAGE 2',
+    section: '4.2 다중회귀와 단순회귀의 관계',
+    sentences: [
+      {eng: "Multiple linear regression is an extension (generalization) of simple linear regression.", kor: "다중 선형 회귀는 단순 선형 회귀의 확장(일반화)이다."},
+      {eng: "Thus, the results given here are essentially extensions of the results given in Chapter 3.", kor: "따라서 여기서 제시된 결과들은 본질적으로 3장에서 주어진 결과들의 확장이다."},
+      {eng: "One can similarly think of simple regression as a special case of multiple regression because all simple regression results can be obtained using the multiple regression results when the number of predictor variables p = 1.", kor: "마찬가지로 단순 회귀를 다중 회귀의 특수한 경우로 생각할 수 있는데, 이는 예측변수의 수 p = 1일 때 다중 회귀 결과를 사용하여 모든 단순 회귀 결과를 얻을 수 있기 때문이다."},
+      {eng: "For example, when p = 1, (4.1) and (4.2) reduce to (3.9) and (3.10), respectively.", kor: "예를 들어, p = 1일 때 식 (4.1)과 (4.2)는 각각 식 (3.9)와 (3.10)으로 축소된다."},
+    ]
+  },
+  {
+    page: 'PAGE 6',
+    section: '4.5 회귀계수의 해석',
+    sentences: [
+      {eng: "The interpretation of the regression coefficients in a multiple regression equation is a source of common confusion.", kor: "다중 회귀 방정식에서 회귀계수의 해석은 흔한 혼란의 원인이다."},
+      {eng: "The simple regression equation represents a line, while the multiple regression equation represents a plane (in cases of two predictors) or a hyperplane (in cases of more than two predictors).", kor: "단순 회귀 방정식은 직선을 나타내는 반면, 다중 회귀 방정식은 평면(두 개의 예측변수인 경우) 또는 초평면(두 개 이상의 예측변수인 경우)을 나타낸다."},
+      {eng: "In multiple regression, the coefficient β0, called the constant coefficient, is the value of Y when X1 = X2 = ··· = Xp = 0, as in simple regression.", kor: "다중 회귀에서 상수 계수라 불리는 계수 β₀는 단순 회귀에서와 마찬가지로 X₁ = X₂ = ... = Xₚ = 0일 때의 Y의 값이다."},
+      {eng: "The regression coefficient βj, j = 1, 2, …, p, has several interpretations.", kor: "회귀계수 βⱼ (j = 1, 2, …, p)는 여러 가지 해석을 가진다."},
+    ]
+  },
+  {
+    page: 'PAGE 14',
+    section: '4.8 결정계수 R²의 의미',
+    sentences: [
+      {eng: "When the model fits the data well, it is clear that the value of R² is close to unity.", kor: "모형이 데이터에 잘 적합될 때, R²의 값이 1에 가까움은 명확하다."},
+      {eng: "With a good fit, the observed and predicted values will be close to each other, and Σ(yi − ŷi)² will be small.", kor: "적합이 좋으면 관측값과 예측값이 서로 가까울 것이며, Σ(yᵢ - ŷᵢ)²는 작을 것이다."},
+      {eng: "Then R² will be near unity.", kor: "그러면 R²는 1에 가까울 것이다."},
+      {eng: "On the other hand, if there is no linear relationship between Y and the predictor variables, X1, …, Xp, the linear model gives a poor fit, the best predicted value for an observation yi would be ȳ; that is, in the absence of any relationship with the predictors, the best estimate of any value of Y is the sample mean.", kor: "반면에 Y와 예측변수 X₁, ..., Xₚ 사이에 선형 관계가 없으면 선형 모형은 좋지 않은 적합을 보이며, 관측값 yᵢ에 대한 최선의 예측값은 ȳ일 것이다; 즉, 예측변수와의 관계가 없는 경우, Y의 어떤 값에 대한 최선의 추정치는 표본 평균이다."},
+    ]
+  },
+  {
+    page: 'PAGE 28',
+    section: '4.11 제약 추정 (Constrained Estimation)',
+    sentences: [
+      {eng: "Sometimes in fitting regression equations to a given body of data it is desired to impose some constraints on the values of the parameters.", kor: "주어진 데이터에 회귀방정식을 적합할 때 모수의 값에 일부 제약조건을 부과하고자 하는 경우가 있다."},
+      {eng: "A common constraint is that the regression coefficients sum to a specified value, usually unity.", kor: "흔한 제약조건은 회귀계수의 합이 지정된 값, 보통 1이 되는 것이다."},
+      {eng: "The constraints often arise because of some theoretical or physical relationships that may connect the variables.", kor: "제약조건은 종종 변수들을 연결하는 어떤 이론적 또는 물리적 관계 때문에 발생한다."},
+      {eng: "Although no such relationships are obvious in our present example, we consider β1 + β3 = 1 for the purpose of demonstration.", kor: "현재 예제에서는 그러한 관계가 명확하지 않지만, 설명을 위해 β₁ + β₃ = 1을 고려한다."},
+    ]
+  },
+];
+
+// ============================================================
+// 기출문제 로직
+// ============================================================
+let kCur=0, kCorrect=0, kWrong=[];
+
+function kStart(){
+  kCur=0; kCorrect=0; kWrong=[];
+  showSubScreen('kichul','quiz');
+  kLoad();
+}
+function kLoad(){
+  const item = KICHUL[kCur];
+  document.getElementById('k-prog-label').textContent=`${kCur+1} / ${KICHUL.length}`;
+  document.getElementById('k-prog-bar').style.width=((kCur)/KICHUL.length*100)+'%';
+  document.getElementById('k-section-label').textContent=`${item.page} · ${item.section}`;
+
+  // 문단 전체 영어 표시
+  const passageEl = document.getElementById('k-passage');
+  passageEl.innerHTML = item.sentences.map((s,i)=>
+    `<span style="display:block;margin-bottom:6px;"><b style="color:#92400e;font-size:0.8rem;">[${i+1}]</b> ${s.eng}</span>`
+  ).join('');
+
+  document.getElementById('k-input').value='';
+  document.getElementById('k-input').disabled=false;
+  document.getElementById('k-model').style.display='none';
+  document.getElementById('k-model-text').innerHTML='';
+  document.getElementById('k-assess').classList.remove('show');
+  document.getElementById('k-submit-btn').style.display='block';
+  document.getElementById('k-input').focus();
+}
+function kSubmit(){
+  const item = KICHUL[kCur];
+  const ans = document.getElementById('k-input').value.trim();
+  if(!ans) return;
+  document.getElementById('k-input').disabled=true;
+  // 모범 번역: 문장별로 표시
+  const modelEl = document.getElementById('k-model');
+  const modelText = document.getElementById('k-model-text');
+  modelText.innerHTML = item.sentences.map((s,i)=>
+    `<div style="margin-bottom:8px;padding:6px 10px;background:#fff;border-radius:6px;">
+      <div style="font-size:0.75rem;color:#92400e;font-weight:700;margin-bottom:3px;">[${i+1}] 영어</div>
+      <div style="font-size:0.82rem;color:#57534e;margin-bottom:4px;">${s.eng}</div>
+      <div style="font-size:0.75rem;color:#92400e;font-weight:700;margin-bottom:2px;">번역</div>
+      <div style="font-size:0.9rem;color:#1c1917;">${s.kor}</div>
+    </div>`
+  ).join('');
+  modelEl.style.display='block';
+  document.getElementById('k-assess').classList.add('show');
+  document.getElementById('k-submit-btn').style.display='none';
+}
+function kSkip(){
+  kWrong.push(KICHUL[kCur]);
+  kSubmit();
+}
+function kAssess(correct){
+  if(correct){ kCorrect++; }
+  else { if(!kWrong.includes(KICHUL[kCur])) kWrong.push(KICHUL[kCur]); }
+  document.getElementById('k-assess').classList.remove('show');
+  kCur++;
+  if(kCur>=KICHUL.length) kShowResult();
+  else kLoad();
+}
+function kShowResult(){
+  const total=KICHUL.length, pct=total>0?Math.round(kCorrect/total*100):0;
+  document.getElementById('k-score-pct').textContent=pct+'%';
+  document.getElementById('k-score-frac').textContent=`${kCorrect} / ${total}`;
+  const msgs=[[100,'4개 문단 모두 완벽해요! 🎉'],[75,'대부분 맞혔어요! 👏'],[50,'절반 이상! 더 연습해요. 📖'],[0,'다시 공부하고 도전해봐요. 💪']];
+  for(const[t,msg] of msgs){ if(pct>=t){document.getElementById('k-result-msg').textContent=msg;break;} }
+  const wc=document.getElementById('k-wrong-card'), wb=document.getElementById('k-wrong-body');
+  wb.innerHTML='';
+  if(kWrong.length>0){
+    wc.style.display='block';
+    kWrong.forEach(item=>{
+      const d=document.createElement('div'); d.className='wrong-item';
+      d.innerHTML=`<div class="wrong-eng" style="margin-bottom:8px;">${item.page} · ${item.section}</div>` +
+        item.sentences.map(s=>`<div style="margin-bottom:6px;font-size:0.82rem;">
+          <span style="color:#991b1b;">${s.eng}</span><br>
+          <span style="color:#1c1917;">→ ${s.kor}</span>
+        </div>`).join('');
+      wb.appendChild(d);
+    });
+  } else wc.style.display='none';
+  showSubScreen('kichul','result');
+}
+function kShowMode(){ showSubScreen('kichul','mode'); }
 </script>
 </body>
 </html>
