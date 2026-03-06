@@ -82,6 +82,7 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
 .result-msg{text-align:center;font-size:1.05rem;font-weight:600;margin-bottom:18px;}
 .wrong-list h3{font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
 .wrong-item{padding:10px 14px;border-radius:8px;margin-bottom:6px;background:#fef2f2;}
+.wrong-word{font-weight:700;color:var(--danger);font-size:1rem;}
 .wrong-eng{font-weight:600;color:var(--danger);font-size:0.9rem;margin-bottom:4px;}
 .wrong-kor{font-size:0.82rem;color:#7f1d1d;line-height:1.5;}
 .result-btns{display:flex;gap:10px;margin-top:18px;}
@@ -166,11 +167,13 @@ header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
       <div class="result-msg" id="v-result-msg"></div>
       <div class="result-btns">
         <button class="btn btn-skip" onclick="vShowMode()">처음으로</button>
-        <button class="btn btn-primary" id="v-retry-btn" onclick="vRetry()">틀린 것만 재시험</button>
       </div>
     </div>
     <div class="card wrong-list" id="v-wrong-card" style="display:none">
-      <h3>틀린 단어 목록</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:0.95rem;color:var(--danger);font-weight:700;" id="v-wrong-title">틀린 단어</h3>
+        <button class="btn btn-primary" id="v-retry-btn" onclick="vRetry()" style="flex:none;padding:9px 18px;font-size:0.88rem;">틀린 단어만 재시험 →</button>
+      </div>
       <div id="v-wrong-body"></div>
     </div>
   </div>
@@ -503,10 +506,15 @@ function vSubmit(){
   document.getElementById('v-next-btn').style.display='block';
 }
 function vCheck(ans,item){
-  const kws=item.mf.match(/[가-힣]+/g)||[];
-  const userKr=ans.match(/[가-힣]+/g)||[];
-  const userStr=userKr.join('');
-  for(const kw of kws){ if(kw.length>=2 && userStr.includes(kw)) return true; }
+  // item.m을 쉼표로 분리 → 각 뜻 중 하나라도 맞으면 정답
+  const meanings = item.m.split(/[,，]/).map(s=>s.trim()).filter(s=>s);
+  const userKr = (ans.match(/[가-힣]+/g)||[]).join('');
+  for(const meaning of meanings){
+    const kws = meaning.match(/[가-힣]+/g)||[];
+    for(const kw of kws){
+      if(kw.length>=2 && userKr.includes(kw)) return true;
+    }
+  }
   return false;
 }
 function vHint(){
@@ -534,11 +542,21 @@ function vShowResult(){
   document.getElementById('v-score-frac').textContent=`${vCorrect} / ${total}`;
   const msgs=[[100,'완벽합니다! 만점! 🎉'],[90,'거의 다 맞혔어요! 👏'],[80,'잘 했어요! 👍'],[60,'절반 이상! 복습이 필요해요. 📖'],[0,'틀린 단어를 다시 공부해봐요. 💪']];
   for(const[t,msg] of msgs){ if(pct>=t){document.getElementById('v-result-msg').textContent=msg;break;} }
-  document.getElementById('v-retry-btn').style.display=vWrong.length>0?'block':'none';
   const wc=document.getElementById('v-wrong-card'), wb=document.getElementById('v-wrong-body');
   wb.innerHTML='';
-  if(vWrong.length>0){ wc.style.display='block'; vWrong.forEach(it=>{ const d=document.createElement('div'); d.className='wrong-item'; d.innerHTML=`<span class="wrong-eng">${it.w}</span> <span class="wrong-kor">→ ${it.m}</span>`; wb.appendChild(d); }); }
-  else wc.style.display='none';
+  if(vWrong.length>0){
+    wc.style.display='block';
+    document.getElementById('v-wrong-title').textContent=`틀린 단어 ${vWrong.length}개`;
+    document.getElementById('v-retry-btn').style.display='block';
+    vWrong.forEach(it=>{
+      const d=document.createElement('div'); d.className='wrong-item';
+      // 정답이 여러 개면 모두 표시
+      const meanings = it.m.split(/[,，]/).map(s=>s.trim()).filter(s=>s);
+      const meaningHTML = meanings.map(m=>`<span style="background:#fff;border-radius:4px;padding:1px 6px;margin-right:4px;font-size:0.82rem;">${m}</span>`).join('');
+      d.innerHTML=`<span class="wrong-word">${it.w}</span><div style="margin-top:5px;">${meaningHTML}</div>`;
+      wb.appendChild(d);
+    });
+  } else wc.style.display='none';
   showSubScreen('vocab','result');
 }
 function vShowMode(){ showSubScreen('vocab','mode'); }
