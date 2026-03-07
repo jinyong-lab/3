@@ -5,93 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>전공영어 시험 | Chapter 4 MLR</title>
 <style>
-:root{--primary:#4f46e5;--primary-dark:#3730a3;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;}
+:root{
+  --primary:#4f46e5;--primary-dark:#3730a3;
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--border:#e2e8f0;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:-apple-system,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:12px;
+}
 .container{width:100%;max-width:700px;}
-header{text-align:center;padding:22px 0 16px;}
-header h1{font-size:1.5rem;color:var(--primary);}
-header p{color:var(--muted);font-size:0.85rem;margin-top:4px;}
 
-/* TAB */
-.tabs{display:flex;gap:8px;margin-bottom:16px;}
-.tab{flex:1;padding:11px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--muted);}
+/* HEADER */
+header{text-align:center;padding:14px 0 10px;}
+header h1{font-size:1.4rem;color:var(--primary);}
+header p{color:var(--muted);font-size:0.82rem;margin-top:3px;}
+
+/* TAB - 스크롤 가능, 3개 탭 모바일 대응 */
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  flex:1;min-width:76px;padding:10px 6px;
+  border-radius:10px;border:2px solid var(--border);
+  background:#fff;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:all .15s;color:var(--muted);
+  white-space:nowrap;touch-action:manipulation;
+  -webkit-appearance:none;
+}
 .tab.active{border-color:var(--primary);background:#ede9fe;color:var(--primary);}
 
 /* SCREEN */
 .screen{display:none;}.screen.active{display:block;}
+
 /* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-.card h2{font-size:1rem;color:var(--text);margin-bottom:14px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.card h2{font-size:0.95rem;color:var(--text);margin-bottom:12px;}
 
 /* MODE GRID */
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
-.mode-btn{border:2px solid var(--border);border-radius:12px;padding:14px 10px;cursor:pointer;background:#fff;text-align:center;transition:all .15s;}
-.mode-btn:hover,.mode-btn.selected{border-color:var(--primary);background:#f0f0ff;}
-.mode-btn .emoji{font-size:1.4rem;display:block;margin-bottom:5px;}
-.mode-btn .label{font-weight:600;font-size:0.9rem;}
-.mode-btn .sub{font-size:0.75rem;color:var(--muted);margin-top:2px;}
-.order-row{display:flex;gap:8px;margin:12px 0;}
-.order-btn{flex:1;padding:9px;border:2px solid var(--border);border-radius:9px;cursor:pointer;background:#fff;font-size:0.88rem;transition:all .15s;}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:10px 0;}
+.mode-btn{border:2px solid var(--border);border-radius:12px;padding:13px 9px;cursor:pointer;background:#fff;text-align:center;transition:border-color .15s;touch-action:manipulation;}
+.mode-btn.selected{border-color:var(--primary);background:#f0f0ff;}
+.mode-btn .emoji{font-size:1.3rem;display:block;margin-bottom:4px;}
+.mode-btn .label{font-weight:600;font-size:0.87rem;}
+.mode-btn .sub{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+
+.order-row{display:flex;gap:7px;margin:10px 0;}
+.order-btn{
+  flex:1;padding:12px 8px;border:2px solid var(--border);
+  border-radius:9px;cursor:pointer;background:#fff;
+  font-size:0.88rem;transition:all .15s;touch-action:manipulation;
+  min-height:46px;-webkit-appearance:none;
+}
 .order-btn.selected{border-color:var(--primary);background:#ede9fe;font-weight:600;}
-.start-btn{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:4px;}
-.start-btn:hover{background:var(--primary-dark);}
+
+.start-btn{
+  width:100%;padding:15px;background:var(--primary);
+  color:#fff;border:none;border-radius:12px;
+  font-size:1rem;font-weight:700;cursor:pointer;margin-top:6px;
+  min-height:50px;touch-action:manipulation;-webkit-appearance:none;
+}
+.start-btn:active{opacity:.85;}
 
 /* PROGRESS */
-.progress-bar-wrap{background:var(--border);border-radius:99px;height:6px;margin-bottom:16px;}
+.progress-bar-wrap{background:var(--border);border-radius:99px;height:6px;margin-bottom:14px;}
 .progress-bar{height:100%;border-radius:99px;background:var(--primary);transition:width .3s;}
-.progress-label{font-size:0.8rem;color:var(--muted);text-align:right;margin-bottom:4px;}
+.progress-label{font-size:0.78rem;color:var(--muted);text-align:right;margin-bottom:4px;}
 
 /* VOCAB QUIZ */
-.freq-badge{display:inline-block;background:#f1f5f9;color:var(--muted);font-size:0.73rem;padding:2px 8px;border-radius:99px;margin-bottom:10px;}
-.word-display{font-size:2rem;font-weight:800;color:var(--primary);margin:8px 0 18px;letter-spacing:-0.5px;}
-.answer-input{width:100%;padding:13px 15px;border:2px solid var(--border);border-radius:12px;font-size:1.05rem;outline:none;transition:border-color .15s;}
+.freq-badge{display:inline-block;background:#f1f5f9;color:var(--muted);font-size:0.72rem;padding:2px 8px;border-radius:99px;margin-bottom:8px;}
+.word-display{font-size:2rem;font-weight:800;color:var(--primary);margin:6px 0 16px;letter-spacing:-0.5px;word-break:break-word;}
+/* iOS zoom 방지: font-size 반드시 16px 이상 */
+.answer-input{
+  width:100%;padding:14px 15px;border:2px solid var(--border);
+  border-radius:12px;font-size:1rem;outline:none;
+  transition:border-color .15s;-webkit-appearance:none;
+}
 .answer-input:focus{border-color:var(--primary);}
 .answer-input.correct{border-color:var(--success);background:#f0fdf4;}
 .answer-input.wrong{border-color:var(--danger);background:#fef2f2;}
-.feedback{margin-top:12px;padding:11px 15px;border-radius:10px;font-size:0.9rem;display:none;}
+
+.feedback{margin-top:10px;padding:11px 14px;border-radius:10px;font-size:0.88rem;display:none;}
 .feedback.correct{background:#d1fae5;color:#065f46;display:block;}
 .feedback.wrong{background:#fee2e2;color:#991b1b;display:block;}
-.feedback .full-meaning{margin-top:3px;font-size:0.82rem;opacity:.8;}
-.btn-row{display:flex;gap:8px;margin-top:14px;}
-.btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:0.9rem;cursor:pointer;font-weight:600;transition:opacity .15s;}
-.btn:hover{opacity:.85;}
+.feedback .full-meaning{margin-top:3px;font-size:0.8rem;opacity:.85;}
+
+.btn-row{display:flex;gap:7px;margin-top:12px;}
+.btn{
+  flex:1;padding:13px 6px;border-radius:10px;border:none;
+  font-size:0.87rem;cursor:pointer;font-weight:600;
+  min-height:48px;touch-action:manipulation;-webkit-appearance:none;
+  transition:opacity .1s;
+}
+.btn:active{opacity:.75;}
 .btn-primary{background:var(--primary);color:#fff;}
 .btn-skip{background:#f1f5f9;color:var(--muted);}
 .btn-hint{background:#fef3c7;color:#92400e;}
 
 /* SENTENCE QUIZ */
-.sent-display{font-size:1.1rem;line-height:1.7;color:var(--text);background:#f8fafc;border-left:4px solid var(--primary);padding:14px 16px;border-radius:0 10px 10px 0;margin:10px 0 16px;}
-.sent-textarea{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;outline:none;resize:vertical;min-height:90px;transition:border-color .15s;line-height:1.6;}
+.sent-display{
+  font-size:0.98rem;line-height:1.75;color:var(--text);
+  background:#f8fafc;border-left:4px solid var(--primary);
+  padding:12px 14px;border-radius:0 10px 10px 0;margin:8px 0 13px;
+  word-break:break-word;
+}
+.sent-textarea{
+  width:100%;padding:13px 14px;border:2px solid var(--border);
+  border-radius:12px;font-size:1rem;outline:none;resize:vertical;
+  min-height:100px;transition:border-color .15s;line-height:1.65;
+  -webkit-appearance:none;
+}
 .sent-textarea:focus{border-color:var(--primary);}
-.model-answer{display:none;margin-top:12px;padding:14px 16px;background:#ede9fe;border-radius:10px;}
-.model-answer .label{font-size:0.75rem;color:var(--primary);font-weight:700;margin-bottom:5px;}
-.model-answer .text{font-size:0.95rem;line-height:1.6;color:#1e1b4b;}
-.self-assess{display:none;flex-direction:row;gap:10px;margin-top:12px;}
+.model-answer{display:none;margin-top:12px;padding:13px 14px;background:#ede9fe;border-radius:10px;}
+.model-answer .label{font-size:0.72rem;color:var(--primary);font-weight:700;margin-bottom:5px;}
+.model-answer .text{font-size:0.92rem;line-height:1.65;color:#1e1b4b;}
+
+.self-assess{display:none;flex-direction:row;gap:8px;margin-top:12px;}
 .self-assess.show{display:flex;}
-.assess-btn{flex:1;padding:12px;border-radius:10px;border:none;font-size:0.95rem;font-weight:700;cursor:pointer;}
+.assess-btn{
+  flex:1;padding:14px 8px;border-radius:10px;border:none;
+  font-size:0.9rem;font-weight:700;cursor:pointer;
+  min-height:50px;touch-action:manipulation;-webkit-appearance:none;
+}
 .assess-correct{background:#d1fae5;color:#065f46;}
-.assess-correct:hover{background:#a7f3d0;}
 .assess-wrong{background:#fee2e2;color:#991b1b;}
-.assess-wrong:hover{background:#fecaca;}
 
 /* RESULT */
-.score-circle{width:130px;height:130px;border-radius:50%;border:8px solid var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 18px;}
-.score-pct{font-size:2rem;font-weight:800;color:var(--primary);}
-.score-sub{font-size:0.75rem;color:var(--muted);}
-.result-msg{text-align:center;font-size:1.05rem;font-weight:600;margin-bottom:18px;}
+.score-circle{width:120px;height:120px;border-radius:50%;border:7px solid var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 16px;}
+.score-pct{font-size:1.9rem;font-weight:800;color:var(--primary);}
+.score-sub{font-size:0.72rem;color:var(--muted);}
+.result-msg{text-align:center;font-size:1rem;font-weight:600;margin-bottom:16px;}
 .wrong-list h3{font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
-.wrong-item{padding:10px 14px;border-radius:8px;margin-bottom:6px;background:#fef2f2;}
-.wrong-eng{font-weight:600;color:var(--danger);font-size:0.9rem;margin-bottom:4px;}
-.wrong-kor{font-size:0.82rem;color:#7f1d1d;line-height:1.5;}
-.result-btns{display:flex;gap:10px;margin-top:18px;}
+.wrong-item{padding:10px 13px;border-radius:8px;margin-bottom:7px;background:#fef2f2;}
+.wrong-word{font-weight:700;color:var(--danger);font-size:1rem;}
+.wrong-eng{font-weight:600;color:var(--danger);font-size:0.88rem;margin-bottom:4px;}
+.wrong-kor{font-size:0.8rem;color:#7f1d1d;line-height:1.5;}
+.result-btns{display:flex;gap:8px;margin-top:16px;}
 
 /* SENT FILTER */
 .sent-filter{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;}
-.filter-btn{padding:6px 12px;border-radius:99px;border:1px solid var(--border);background:#fff;font-size:0.8rem;cursor:pointer;transition:all .15s;}
+.filter-btn{padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:#fff;font-size:0.8rem;cursor:pointer;transition:all .15s;}
 .filter-btn.selected{border-color:var(--primary);background:#ede9fe;color:var(--primary);font-weight:600;}
 
-@media(max-width:480px){.mode-grid{grid-template-columns:1fr;}.word-display{font-size:1.6rem;}.sent-display{font-size:1rem;}}
+/* 모바일 반응형 */
+@media(max-width:400px){
+  body{padding:8px;}
+  .card{padding:14px;}
+  header h1{font-size:1.2rem;}
+  .tab{font-size:0.75rem;padding:9px 4px;min-width:68px;}
+  .word-display{font-size:1.7rem;}
+  .mode-btn .label{font-size:0.82rem;}
+  .btn{padding:12px 5px;font-size:0.82rem;}
+  .assess-btn{font-size:0.85rem;padding:13px 5px;}
+  .score-circle{width:108px;height:108px;}
+  .score-pct{font-size:1.7rem;}
+  .result-btns{flex-direction:column;}
+  .sent-display{font-size:0.92rem;}
+}
+@media(max-width:340px){
+  .mode-grid{grid-template-columns:1fr;}
+  .tabs{gap:4px;}
+  .tab{min-width:60px;font-size:0.7rem;}
+}
 </style>
 </head>
 <body>
